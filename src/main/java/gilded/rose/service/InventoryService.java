@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import gilded.rose.model.Item;
 
 @Service
 public class InventoryService {
-	private static Map<Item,Integer>mapItems;
+	private  Map<Item,Integer>mapItems;
 	  
-	 static{ 
+	 { 
 		 mapItems=new HashMap<Item,Integer>();
 		 mapItems.put(new Item("Chocolate","MilkyBar",78),5);
 		 mapItems.put(new Item("T Shirt","US Polo",48),4); 
@@ -27,17 +27,22 @@ public class InventoryService {
 	
 	
 	 public List<Item> getAllItemsFromInventory(boolean priceUpdate){
-			
-		  Collection<Item> keys = mapItems.keySet();
-		  
-		  ArrayList<Item> listOfKeys =new ArrayList<Item>(keys);
+			Collection<Item> keys = mapItems.keySet();
+		    ArrayList<Item> listOfKeys =new ArrayList<Item>(keys);
 		
 		 if(priceUpdate) { 
-			 List<Item>updatedPriceofKeys=listOfKeys.stream().map(f->new Item(f.getName(),f.getDescription(),f.getPrice()+10*f.getPrice()/100)).collect(Collectors.toList());
-			 mapItems = mapItems.entrySet().stream()
-						.filter(x -> x.getKey()==new Item(x.getKey().getName(),x.getKey().getDescription(),x.getKey().getPrice()+10*x.getKey().getPrice()/100))
-						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-			 return updatedPriceofKeys;
+			 Map<Item,Integer>mapp=new HashMap<Item,Integer>();
+			 for(Map.Entry<Item, Integer>temp:mapItems.entrySet()) {
+					Item item=temp.getKey();
+					int newPrice=item.getPrice()+10*item.getPrice()/100;
+					item.setPrice(newPrice);
+					mapp.put(item, temp.getValue());
+					}
+			 mapItems.clear();
+			 mapItems.putAll(mapp);
+			 keys = mapItems.keySet();
+			 listOfKeys =new ArrayList<Item>(keys);
+			 return listOfKeys;
 			 
 		 } 
 		 else 
