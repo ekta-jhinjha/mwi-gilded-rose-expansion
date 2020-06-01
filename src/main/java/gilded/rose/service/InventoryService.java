@@ -17,20 +17,21 @@ public class InventoryService {
 	  
 	 { 
 		 mapItems=new HashMap<Item,Integer>();
-		 mapItems.put(new Item("Chocolate","MilkyBar",78),5);
-		 mapItems.put(new Item("T Shirt","US Polo",48),4); 
-		 mapItems.put(new Item("Pencil","HB Pencil",14),3);
-		 mapItems.put(new Item("Notebook","HB Notebook",40),2); 
+		 mapItems.put(new Item(11,"Chocolate","MilkyBar",78),5);
+		 mapItems.put(new Item(12,"T Shirt","US Polo",48),4); 
+		 mapItems.put(new Item(13,"Pencil","HB Pencil",14),3);
+		 mapItems.put(new Item(14,"Notebook","HB Notebook",40),2); 
 		 }
 	 
 	
-	
+	 static boolean surgedPrice=false;
 	
 	 public List<Item> getAllItemsFromInventory(boolean priceUpdate){
+		 System.out.println("Start of method getAllItemsFromInventory and priceUpdate value "+priceUpdate);
 			Collection<Item> keys = mapItems.keySet();
 		    ArrayList<Item> listOfKeys =new ArrayList<Item>(keys);
 		
-		 if(priceUpdate) { 
+		 if(priceUpdate && !surgedPrice ) { 
 			 Map<Item,Integer>mapp=new HashMap<Item,Integer>();
 			 for(Map.Entry<Item, Integer>temp:mapItems.entrySet()) {
 					Item item=temp.getKey();
@@ -42,7 +43,9 @@ public class InventoryService {
 			 mapItems.putAll(mapp);
 			 keys = mapItems.keySet();
 			 listOfKeys =new ArrayList<Item>(keys);
+			 surgedPrice=true;
 			 return listOfKeys;
+			 
 			 
 		 } 
 		 else 
@@ -50,19 +53,30 @@ public class InventoryService {
 			
 	}
 	
-	public String buyRequestedItem(String itemname,String itemDescription, int price) {
-		Item item=new Item(itemname,itemDescription,price);
-		if(mapItems.get(item)!=0) {
-			mapItems.put(item, mapItems.get(item)-1);
+	public String buyRequestedItem(int itemId, int quantity) {
+		System.out.println("Inside method buyRequestedItem itemId : "+itemId+" quantity : "+quantity);
+		for(Map.Entry<Item, Integer>temp:mapItems.entrySet()) {
+			Item item=temp.getKey();
+			int id=item.getItemId();
+			if(itemId==id) {
+				return buyAndUpdateItems(item,quantity);
+			}
+			}
+		return "Yours requested item is not valid";
+		
+}
+	
+	public String buyAndUpdateItems(Item item,int quantity) {
+		System.out.println("Start of method buyAndUpdateItems and quantity value "+quantity);
+		if(mapItems.get(item)!=0 && mapItems.get(item)>=quantity) {
+			mapItems.put(item, mapItems.get(item)-quantity);
 			return "You Order has been placed succesfully";
 		}
 		
 		else
 			return "Sorry this item is out of stock";
-		
-		
-		
 	}
+	
 	
 	
 	
