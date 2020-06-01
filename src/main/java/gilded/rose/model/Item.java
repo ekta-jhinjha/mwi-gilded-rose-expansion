@@ -3,6 +3,8 @@ package gilded.rose.model;
 
 
 public class Item {
+
+private int itemId;
 private String name;
 private String description;
 private int price;
@@ -11,8 +13,9 @@ private int price;
 public Item() {
 	
 }
-public Item(String name,String description, int price) {
+public Item(int id,String name,String description, int price) {
 	super();
+	itemId=id;
 	this.name=name;
 	this.description=description;
 	this.price=price;
@@ -39,15 +42,22 @@ public void setPrice(int price) {
 	this.price = price;
 }
 
+
+public int getItemId() {
+	return itemId;
+}
+public void setItemId(int itemId) {
+	this.itemId = itemId;
+}
 public int hashCode() {
-	int hash=name.hashCode()+description.hashCode()+(int)price;
+	int hash=(int)itemId+name.hashCode()+description.hashCode()+(int)price;
 	return hash;
 }
 
 public boolean equals(Object obj) {
 	if(obj!=null && obj instanceof Item) {
 		Item item=(Item)obj;
-		if(this.getName().equals(item.getName())) {
+		if(this.getItemId()==item.getItemId()) {
 			return true;
 		}
 		
@@ -57,7 +67,7 @@ public boolean equals(Object obj) {
 }
 
 public String toString() {
-	return name +" "+description+" "+price;
+	return itemId+" "+name +" "+description+" "+price;
 }
 
 
