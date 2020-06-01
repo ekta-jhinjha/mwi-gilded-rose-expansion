@@ -2,9 +2,10 @@ package gilded.rose.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,31 +14,31 @@ import gilded.rose.service.InventoryService;
 
 @RestController
 public class InventoryController {
-
-	static int  counter=0;
-	static LocalDateTime dtime;
+	
+	static List<LocalDateTime>requestTimeLists=new ArrayList<LocalDateTime>();
 	
 	@Autowired
 	private InventoryService inventoryService;
 
-	@RequestMapping("/items")
+	@RequestMapping("/v1/items")
 	public List<Item> getAllItems() {
-		counter++;
+		System.out.println("Inside start of  method getAllItems ");
 		boolean priceUpdate=false;
-		if(null==dtime) {
-			 dtime= LocalDateTime.now();
-		}
-		if(counter>10) {
-			LocalDateTime now=LocalDateTime.now();
-			long hours = Duration.between(dtime, now).toHours();
-			if (hours <=1 ) {
-				priceUpdate=true;
-				counter=0;
-				dtime=now;
-				
-			} 
-		}
-		
+		LocalDateTime currentTime=LocalDateTime.now();
+		requestTimeLists.add(currentTime);
+		for(int i=requestTimeLists.size()-1;i>=0;i--) {
+				for(int j=i-1;j>=0;j--) {
+					if(Duration.between(requestTimeLists.get(i), requestTimeLists.get(j)).toHours()<=1 &&(i-j==10)) {
+						System.out.println("if time difference is less than or equal to 1 hour and views is more than 10");
+						priceUpdate=true;
+						break;
+					}
+					
+				}
+				if(priceUpdate) {
+					break;
+				}
+			}
 		
 		return inventoryService.getAllItemsFromInventory(priceUpdate);
 	}
@@ -46,14 +47,14 @@ public class InventoryController {
 	
 	
 	
-	@RequestMapping("/buyItem")
-	public String buyItem(@RequestBody Item item) {
-		
-		String itemName=item.getName();
-		String description=item.getDescription();
-		int price=item.getPrice();
-		return inventoryService.buyRequestedItem(itemName,description,price);
+	@RequestMapping("/v1/buyItem/{itemId}/{quantity}")
+	public String buyItem(@PathVariable int itemId,@PathVariable int quantity) {
+		System.out.println("Inside method buyItem itemId "+itemId+" requested quantity "+quantity);
+		return inventoryService.buyRequestedItem(itemId,quantity);
 	}
+	
+	
+	
 	
 	
 }
